@@ -113,6 +113,26 @@
             box-shadow: 0 0 8px #f59e0b;
         }
 
+        .data-source-selector {
+            background: #161a24;
+            border-radius: 20px;
+            padding: 0.5rem 1rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .data-source-selector select {
+            background: #0f121b;
+            border: 1px solid #2d3243;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 40px;
+            font-size: 0.8rem;
+            cursor: pointer;
+        }
+
         .result-card {
             background: #0f121b;
             border-radius: 28px;
@@ -203,6 +223,14 @@
             margin-top: 2rem;
             color: #5f6a84;
         }
+        
+        .data-source-badge {
+            background: #3b82f620;
+            padding: 2px 10px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            display: inline-block;
+        }
     </style>
 </head>
 <body>
@@ -210,51 +238,61 @@
     <div class="header">
         <div class="title">
             <h1>🔮 Oracle · Crypto Forecast</h1>
-            <p>12 semanas de rangos esperados · Análisis técnico + fundamental</p>
+            <p>12 semanas de rangos esperados · Múltiples fuentes de datos</p>
         </div>
         <div class="badge">⚡ Soporta BTC, ETH, Top 20</div>
     </div>
 
     <div class="control-panel">
-        <div style="margin-bottom: 10px; font-weight: 500;">📌 Selecciona criptomonedas (máximo 5 para evitar límites de API)</div>
+        <div style="margin-bottom: 10px; font-weight: 500;">📌 Selecciona criptomonedas</div>
         <div class="token-grid" id="tokenGrid"></div>
         <div class="btn-group">
             <button class="btn-generate" id="generateBtn">🚀 Generar forecast 12 semanas</button>
             <button class="btn-advanced" id="advancedBtn">⚙️ Activar análisis técnico avanzado</button>
         </div>
-        <div id="advancedStatus" style="font-size: 0.75rem; color: #9ca3af;">Modo básico: solo tendencia + ATR</div>
+        <div class="data-source-selector" style="margin-top: 1rem;">
+            <span>📡 Fuente de datos:</span>
+            <select id="dataSourceSelect">
+                <option value="auto">🔄 Auto (fallback automático)</option>
+                <option value="coingecko">🐸 CoinGecko (sin API key)</option>
+                <option value="coinpaprika">🌶️ CoinPaprika (sin API key)</option>
+                <option value="cryptocompare">📊 CryptoCompare (sin API key)</option>
+            </select>
+            <span style="font-size: 0.7rem; color: #8ca0b0;">El sistema probará múltiples fuentes si falla</span>
+        </div>
+        <div id="advancedStatus" style="font-size: 0.75rem; color: #9ca3af; margin-top: 0.8rem;">Modo básico: solo tendencia + ATR</div>
     </div>
 
     <div id="resultsContainer"></div>
     <div class="disclaimer">
-        ⚠️ Los datos provienen de CoinGecko (pública). Las predicciones son modelos educativos, no consejo financiero.
-        <br>Si ves errores, espera unos segundos y reintenta (límite de 30 peticiones por minuto).
+        ⚠️ Datos de múltiples APIs públicas. Las predicciones son modelos educativos, no consejo financiero.
+        <br>Si ves errores, espera unos segundos y reintenta.
     </div>
 </div>
 
 <script>
-    // TOP 20
+    // ======================= TOP 20 =======================
     const TOP20 = [
-        { symbol: "BTC", name: "Bitcoin", id: "bitcoin" },
-        { symbol: "ETH", name: "Ethereum", id: "ethereum" },
-        { symbol: "BNB", name: "BNB", id: "binancecoin" },
-        { symbol: "XRP", name: "XRP", id: "ripple" },
-        { symbol: "ADA", name: "Cardano", id: "cardano" },
-        { symbol: "SOL", name: "Solana", id: "solana" },
-        { symbol: "DOGE", name: "Dogecoin", id: "dogecoin" },
-        { symbol: "DOT", name: "Polkadot", id: "polkadot" },
-        { symbol: "MATIC", name: "Polygon", id: "polygon" },
-        { symbol: "SHIB", name: "Shiba Inu", id: "shiba-inu" },
-        { symbol: "TRX", name: "TRON", id: "tron" },
-        { symbol: "AVAX", name: "Avalanche", id: "avalanche-2" },
-        { symbol: "UNI", name: "Uniswap", id: "uniswap" },
-        { symbol: "ATOM", name: "Cosmos", id: "cosmos" },
-        { symbol: "LINK", name: "Chainlink", id: "chainlink" },
-        { symbol: "ETC", name: "Ethereum Classic", id: "ethereum-classic" },
-        { symbol: "XLM", name: "Stellar", id: "stellar" },
-        { symbol: "BCH", name: "Bitcoin Cash", id: "bitcoin-cash" },
-        { symbol: "ALGO", name: "Algorand", id: "algorand" },
-        { symbol: "LTC", name: "Litecoin", id: "litecoin" }
+        { symbol: "BTC", name: "Bitcoin", id: "bitcoin", coingeckoId: "bitcoin", coinpaprikaId: "btc-bitcoin", cryptocompareFsym: "BTC" },
+        { symbol: "ETH", name: "Ethereum", id: "ethereum", coingeckoId: "ethereum", coinpaprikaId: "eth-ethereum", cryptocompareFsym: "ETH" },
+        { symbol: "BNB", name: "BNB", id: "binancecoin", coingeckoId: "binancecoin", coinpaprikaId: "bnb-binance-coin", cryptocompareFsym: "BNB" },
+        { symbol: "XRP", name: "XRP", id: "ripple", coingeckoId: "ripple", coinpaprikaId: "xrp-xrp", cryptocompareFsym: "XRP" },
+        { symbol: "ADA", name: "Cardano", id: "cardano", coingeckoId: "cardano", coinpaprikaId: "ada-cardano", cryptocompareFsym: "ADA" },
+        { symbol: "SOL", name: "Solana", id: "solana", coingeckoId: "solana", coinpaprikaId: "sol-solana", cryptocompareFsym: "SOL" },
+        { symbol: "DOGE", name: "Dogecoin", id: "dogecoin", coingeckoId: "dogecoin", coinpaprikaId: "doge-dogecoin", cryptocompareFsym: "DOGE" },
+        { symbol: "DOT", name: "Polkadot", id: "polkadot", coingeckoId: "polkadot", coinpaprikaId: "dot-polkadot", cryptocompareFsym: "DOT" },
+        { symbol: "MATIC", name: "Polygon", id: "polygon", coingeckoId: "polygon", coinpaprikaId: "matic-polygon", cryptocompareFsym: "MATIC" },
+        { symbol: "SHIB", name: "Shiba Inu", id: "shiba-inu", coingeckoId: "shiba-inu", coinpaprikaId: "shib-shiba-inu", cryptocompareFsym: "SHIB" },
+        { symbol: "TRX", name: "TRON", id: "tron", coingeckoId: "tron", coinpaprikaId: "trx-tron", cryptocompareFsym: "TRX" },
+        { symbol: "AVAX", name: "Avalanche", id: "avalanche-2", coingeckoId: "avalanche-2", coinpaprikaId: "avax-avalanche", cryptocompareFsym: "AVAX" },
+        { symbol: "UNI", name: "Uniswap", id: "uniswap", coingeckoId: "uniswap", coinpaprikaId: "uni-uniswap", cryptocompareFsym: "UNI" },
+        { symbol: "ATOM", name: "Cosmos", id: "cosmos", coingeckoId: "cosmos", coinpaprikaId: "atom-cosmos", cryptocompareFsym: "ATOM" },
+        { symbol: "LINK", name: "Chainlink", id: "chainlink", coingeckoId: "chainlink", coinpaprikaId: "link-chainlink", cryptocompareFsym: "LINK" },
+        { symbol: "ETC", name: "Ethereum Classic", id: "ethereum-classic", coingeckoId: "ethereum-classic", coinpaprikaId: "etc-ethereum-classic", cryptocompareFsym: "ETC" },
+        { symbol: "XLM", name: "Stellar", id: "stellar", coingeckoId: "stellar", coinpaprikaId: "xlm-stellar", cryptocompareFsym: "XLM" },
+        { symbol: "BCH", name: "Bitcoin Cash", id: "bitcoin-cash", coingeckoId: "bitcoin-cash", coinpaprikaId: "bch-bitcoin-cash", cryptocompareFsym: "BCH" },
+        { symbol: "ALGO", name: "Algorand", id: "algorand", coingeckoId: "algorand", coinpaprikaId: "algo-algorand", cryptocompareFsym: "ALGO" },
+        { symbol: "LTC", name: "Litecoin", id: "litecoin", coingeckoId: "litecoin", coinpaprikaId: "ltc-litecoin", cryptocompareFsym: "LTC" }
     ];
 
     let selectedTokens = new Set(["BTC", "ETH"]);
@@ -269,8 +307,8 @@
             chip.textContent = t.symbol;
             chip.addEventListener("click", () => {
                 if (selectedTokens.has(t.symbol)) selectedTokens.delete(t.symbol);
-                else if (selectedTokens.size < 6) selectedTokens.add(t.symbol);
-                else alert("Máximo 5 tokens para evitar límites de API");
+                else if (selectedTokens.size < 8) selectedTokens.add(t.symbol);
+                else alert("Máximo 8 tokens por solicitud");
                 renderTokenGrid();
             });
             grid.appendChild(chip);
@@ -334,7 +372,87 @@
         return Math.min(Math.max(weeklyDrift, -0.18), 0.12);
     }
 
-    // Avanzado: soportes/resistencias, patrones, divergencias, volumen, eventos
+    // ======================= DATA SOURCES =======================
+    async function fetchFromCoinGecko(token, days = 180) {
+        const ohlcUrl = `https://api.coingecko.com/api/v3/coins/${token.coingeckoId}/ohlc?vs_currency=usd&days=${days}`;
+        const marketUrl = `https://api.coingecko.com/api/v3/coins/${token.coingeckoId}/market_chart?vs_currency=usd&days=${days}`;
+        const [ohlc, market] = await Promise.all([
+            fetch(ohlcUrl).then(r => { if (!r.ok) throw new Error(`CoinGecko OHLC ${r.status}`); return r.json(); }),
+            fetch(marketUrl).then(r => { if (!r.ok) throw new Error(`CoinGecko market ${r.status}`); return r.json(); })
+        ]);
+        if (!ohlc || !ohlc.length) throw new Error("No OHLC data from CoinGecko");
+        const volumes = market.total_volumes.map(v => v[1]);
+        const minLen = Math.min(ohlc.length, volumes.length);
+        return {
+            closes: ohlc.slice(0,minLen).map(bar=>bar[4]),
+            highs: ohlc.slice(0,minLen).map(bar=>bar[2]),
+            lows: ohlc.slice(0,minLen).map(bar=>bar[3]),
+            opens: ohlc.slice(0,minLen).map(bar=>bar[1]),
+            volumes: volumes.slice(0,minLen),
+            source: "CoinGecko"
+        };
+    }
+
+    async function fetchFromCoinPaprika(token, days = 180) {
+        // CoinPaprika OHLC historical endpoint
+        const url = `https://api.coinpaprika.com/v1/coins/${token.coinpaprikaId}/ohlcv/historical?start=${Math.floor(Date.now()/1000 - days*86400)}&limit=${days}`;
+        const response = await fetch(url);
+        if (!response.ok) throw new Error(`CoinPaprika ${response.status}`);
+        const data = await response.json();
+        if (!data || !data.length) throw new Error("No OHLC data from CoinPaprika");
+        // CoinPaprika returns data in ascending order
+        const closes = data.map(bar => bar.close);
+        const highs = data.map(bar => bar.high);
+        const lows = data.map(bar => bar.low);
+        const opens = data.map(bar => bar.open);
+        const volumes = data.map(bar => bar.volume);
+        return { closes, highs, lows, opens, volumes, source: "CoinPaprika" };
+    }
+
+    async function fetchFromCryptoCompare(token, days = 180) {
+        // CryptoCompare histoday endpoint
+        const url = `https://min-api.cryptocompare.com/data/v2/histoday?fsym=${token.cryptocompareFsym}&tsym=USD&limit=${days}`;
+        const response = await fetch(url);
+        if (!response.ok) throw new Error(`CryptoCompare ${response.status}`);
+        const json = await response.json();
+        if (json.Response !== "Success") throw new Error(`CryptoCompare error: ${json.Message}`);
+        const data = json.Data.Data;
+        if (!data || !data.length) throw new Error("No OHLC data from CryptoCompare");
+        const closes = data.map(bar => bar.close);
+        const highs = data.map(bar => bar.high);
+        const lows = data.map(bar => bar.low);
+        const opens = data.map(bar => bar.open);
+        const volumes = data.map(bar => bar.volumefrom);
+        return { closes, highs, lows, opens, volumes, source: "CryptoCompare" };
+    }
+
+    async function fetchTokenDataWithFallback(token, preferredSource = "auto") {
+        const sources = [];
+        if (preferredSource === "auto") {
+            sources.push(fetchFromCoinGecko, fetchFromCoinPaprika, fetchFromCryptoCompare);
+        } else if (preferredSource === "coingecko") {
+            sources.push(fetchFromCoinGecko, fetchFromCoinPaprika, fetchFromCryptoCompare);
+        } else if (preferredSource === "coinpaprika") {
+            sources.push(fetchFromCoinPaprika, fetchFromCoinGecko, fetchFromCryptoCompare);
+        } else if (preferredSource === "cryptocompare") {
+            sources.push(fetchFromCryptoCompare, fetchFromCoinGecko, fetchFromCoinPaprika);
+        }
+        
+        let lastError = null;
+        for (const fetcher of sources) {
+            try {
+                const result = await fetcher(token);
+                return result;
+            } catch (err) {
+                console.warn(`Failed with ${fetcher.name}:`, err);
+                lastError = err;
+                continue;
+            }
+        }
+        throw new Error(`All data sources failed: ${lastError?.message}`);
+    }
+
+    // ========== ANÁLISIS AVANZADO ==========
     function findSupportResistance(prices, lookback = 20, threshold = 0.02) {
         let levels = [];
         for (let i = lookback; i < prices.length - lookback; i++) {
@@ -406,41 +524,10 @@
         return Math.min(event, 0.5);
     }
 
-    // Fetch con reintentos y manejo de errores
-    async function fetchWithRetry(url, retries = 2) {
-        for (let i = 0; i <= retries; i++) {
-            try {
-                const res = await fetch(url);
-                if (!res.ok) throw new Error(`HTTP ${res.status}`);
-                return await res.json();
-            } catch (e) {
-                if (i === retries) throw e;
-                await new Promise(r => setTimeout(r, 1000));
-            }
-        }
-    }
-
-    async function fetchTokenData(tokenId) {
-        const ohlcUrl = `https://api.coingecko.com/api/v3/coins/${tokenId}/ohlc?vs_currency=usd&days=180`;
-        const marketUrl = `https://api.coingecko.com/api/v3/coins/${tokenId}/market_chart?vs_currency=usd&days=180`;
-        const [ohlc, market] = await Promise.all([
-            fetchWithRetry(ohlcUrl),
-            fetchWithRetry(marketUrl)
-        ]);
-        if (!ohlc || !ohlc.length) throw new Error("No OHLC data");
-        const volumes = market.total_volumes.map(v => v[1]);
-        const minLen = Math.min(ohlc.length, volumes.length);
-        const closes = ohlc.slice(0,minLen).map(bar=>bar[4]);
-        const highs = ohlc.slice(0,minLen).map(bar=>bar[2]);
-        const lows = ohlc.slice(0,minLen).map(bar=>bar[3]);
-        const opens = ohlc.slice(0,minLen).map(bar=>bar[1]);
-        const vols = volumes.slice(0,minLen);
-        return { closes, highs, lows, opens, volumes: vols };
-    }
-
-    async function generateForecastForToken(token) {
-        const { symbol, name, id } = token;
-        const { closes, highs, lows, opens, volumes } = await fetchTokenData(id);
+    async function generateForecastForToken(token, preferredSource = "auto") {
+        const { symbol, name } = token;
+        const { closes, highs, lows, opens, volumes, source } = await fetchTokenDataWithFallback(token, preferredSource);
+        
         if (closes.length < 50) throw new Error("Datos insuficientes");
         
         const lastClose = closes[closes.length-1];
@@ -456,7 +543,6 @@
         let rangeMult = 1.0;
         
         if (advancedMode) {
-            // Soportes/resistencias
             const levels = findSupportResistance(closes);
             let nearSupport = null, nearResist = null;
             for (let l of levels) {
@@ -466,23 +552,18 @@
             if (nearSupport && (lastClose - nearSupport)/lastClose < 0.03) extraDrift += 0.008;
             if (nearResist && (nearResist - lastClose)/lastClose < 0.03) extraDrift -= 0.006;
             
-            // Patrones de velas
             const pattern = detectCandlestickPatterns(opens, highs, lows, closes);
             extraDrift += pattern * 0.015;
             
-            // Divergencias RSI
             const div = detectRSIDivergence(closes, rsiArr);
             extraDrift += div * 0.02;
             
-            // Volumen
             const volAdj = volumeAnalysis(volumes);
             extraDrift += volAdj * 0.01;
             
-            // Eventos
             const eventAdj = eventAdjustment(closes, volumes);
             extraDrift += eventAdj * 0.02;
             
-            // Ajuste de rango por volatilidad
             const avgVol = volumes.slice(-20).reduce((a,b)=>a+b,0)/20;
             if (volumes[volumes.length-1] > avgVol*1.5) rangeMult = 1.2;
             if (Math.abs(extraDrift) > 0.02) rangeMult *= 1.1;
@@ -515,7 +596,8 @@
             currentAtr: currentAtr.toFixed(2),
             driftPercent: (effectiveDrift*100).toFixed(2),
             forecasts,
-            advancedUsed: advancedMode
+            advancedUsed: advancedMode,
+            dataSource: source
         };
     }
 
@@ -530,6 +612,7 @@
                     <span>📊 RSI: ${r.currentRsi}</span>
                     <span>⚡ ATR: $${r.currentAtr}</span>
                     <span>📈 Drift: ${r.driftPercent}%</span>
+                    <span class="data-source-badge">📡 ${r.dataSource}</span>
                     ${advBadge}
                 </div>
             </div>
@@ -575,25 +658,25 @@
             resultsDiv.innerHTML = `<div class="error-box">❌ Selecciona al menos una criptomoneda.</div>`;
             return;
         }
-        resultsDiv.innerHTML = `<div class="loading"><div class="spinner"></div> Obteniendo datos de CoinGecko (puede tomar 20-30s)...</div>`;
+        resultsDiv.innerHTML = `<div class="loading"><div class="spinner"></div> Obteniendo datos de múltiples fuentes (puede tomar 20-30s)...</div>`;
         
+        const preferredSource = document.getElementById("dataSourceSelect").value;
         const tokensToFetch = TOP20.filter(t => selected.includes(t.symbol));
         const results = [];
         for (let i = 0; i < tokensToFetch.length; i++) {
             const token = tokensToFetch[i];
             try {
-                const forecast = await generateForecastForToken(token);
+                const forecast = await generateForecastForToken(token, preferredSource);
                 results.push(forecast);
-                // Pequeña pausa para evitar rate limiting
-                await new Promise(r => setTimeout(r, 800));
+                await new Promise(r => setTimeout(r, 500));
             } catch (err) {
                 console.error(`Error con ${token.symbol}:`, err);
-                resultsDiv.innerHTML += `<div class="result-card" style="background:#1e1a24; padding:1rem;">❌ ${token.symbol} falló: ${err.message}. Intenta de nuevo en unos segundos.</div>`;
+                resultsDiv.innerHTML += `<div class="result-card" style="background:#1e1a24; padding:1rem;">❌ ${token.symbol} falló: ${err.message}. Intenta de nuevo.</div>`;
             }
         }
         
         if (results.length === 0) {
-            resultsDiv.innerHTML = `<div class="error-box">⚠️ No se pudo generar ningún forecast. Revisa tu conexión o espera un minuto (límite de API).</div>`;
+            resultsDiv.innerHTML = `<div class="error-box">⚠️ No se pudo generar ningún forecast. Revisa tu conexión o espera un minuto.</div>`;
         } else {
             resultsDiv.innerHTML = results.map(r => renderResult(r)).join('');
         }
