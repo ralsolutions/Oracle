@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Trade Hub - Crypto Forecast 12 Semanas</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #0a0c12;
+            font-family: 'Segoe UI', 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Roboto', monospace;
+            color: #e0e3eb;
+            padding: 2rem 1.5rem;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* encabezado estilo trading hub */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            border-bottom: 1px solid #2a2e3c;
+            padding-bottom: 1.2rem;
+        }
+
+        .title h1 {
+            font-size: 1.8rem;
+            background: linear-gradient(135deg, #c0f2b0, #4aff9e);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            letter-spacing: -0.5px;
+        }
+
+        .title p {
+            font-size: 0.85rem;
+            color: #8e95a8;
+            margin-top: 0.25rem;
+        }
+
+        .badge {
+            background: #1e212c;
+            padding: 0.4rem 1rem;
+            border-radius: 40px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            border: 1px solid #2f3545;
+            color: #b9ffd6;
+        }
+
+        /* panel de control */
+        .control-panel {
+            background: #0f121b;
+            border-radius: 24px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            border: 1px solid #252a38;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+        }
+
+        .token-selector {
+            margin-bottom: 1.5rem;
+        }
+
+        .token-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.6rem;
+            margin-top: 0.8rem;
+        }
+
+        .token-chip {
+            background: #161a24;
+            border-radius: 40px;
+            padding: 0.5rem 1.2rem;
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: 1px solid #2d3243;
+            color: #bfc7df;
+        }
+
+        .token-chip.selected {
+            background: #2cff9e20;
+            border-color: #2cff9e;
+            color: #b6ffd0;
+            box-shadow: 0 0 6px rgba(44,255,158,0.3);
+        }
+
+        .token-chip:hover {
+            background: #202433;
+            transform: translateY(-1px);
+        }
+
+        .btn-generate {
+            background: linear-gradient(90deg, #00c896, #00a97a);
+            border: none;
+            color: #0a0c12;
+            font-weight: bold;
+            padding: 0.8rem 2rem;
+            border-radius: 48px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: 0.2s;
+            box-shadow: 0 2px 8px rgba(0,200,150,0.3);
+            width: 100%;
+            max-width: 260px;
+            font-family: inherit;
+        }
+
+        .btn-generate:hover {
+            background: linear-gradient(90deg, #00e6aa, #00c48a);
+            transform: scale(1.01);
+            box-shadow: 0 4px 14px rgba(0,200,150,0.4);
+        }
+
+        /* cards de resultados */
+        .result-card {
+            background: #0f121b;
+            border-radius: 28px;
+            margin-bottom: 2rem;
+            border: 1px solid #262d3e;
+            overflow-x: auto;
+            transition: all 0.2s;
+        }
+
+        .result-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 1.5rem;
+            background: #0b0e16;
+            border-bottom: 1px solid #232838;
+        }
+
+        .coin-symbol {
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #fff, #88ffb0);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .indicators {
+            display: flex;
+            gap: 1.2rem;
+            font-size: 0.8rem;
+        }
+
+        .indicators span {
+            background: #1a1e2a;
+            padding: 0.25rem 0.7rem;
+            border-radius: 20px;
+            font-family: monospace;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.85rem;
+        }
+
+        th, td {
+            padding: 0.9rem 0.8rem;
+            text-align: center;
+            border-bottom: 1px solid #1e2332;
+        }
+
+        th {
+            background: #0c0f18;
+            color: #b7c0dd;
+            font-weight: 600;
+            position: sticky;
+            top: 0;
+        }
+
+        td {
+            color: #d2d9f0;
+        }
+
+        .price-low {
+            color: #ff9f7c;
+        }
+        .price-central {
+            color: #d0ffb0;
+            font-weight: 500;
+        }
+        .price-high {
+            color: #7cf9b0;
+        }
+
+        .loading {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 12px;
+            padding: 2rem;
+            color: #8e9aaf;
+        }
+
+        .spinner {
+            width: 24px;
+            height: 24px;
+            border: 3px solid #2cff9e30;
+            border-top: 3px solid #2cff9e;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .disclaimer {
+            text-align: center;
+            font-size: 0.7rem;
+            margin-top: 2.5rem;
+            color: #5f6a84;
+            border-top: 1px solid #202433;
+            padding-top: 1.5rem;
+        }
+
+        @media (max-width: 700px) {
+            body { padding: 1rem; }
+            th, td { padding: 0.5rem 0.3rem; font-size: 0.7rem; }
+            .result-header { flex-direction: column; align-items: flex-start; gap: 0.6rem; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <div class="title">
+            <h1>📊 Trade Hub · Crypto Forecast</h1>
+            <p>Análisis técnico + fundamental | Rango de precios esperados (Lunes - 12 semanas)</p>
+        </div>
+        <div class="badge">🔮 modelo híbrido | ATR + drift lineal</div>
+    </div>
+
+    <div class="control-panel">
+        <div class="token-selector">
+            <div style="margin-bottom: 10px; font-weight: 500;">📌 Selecciona criptomonedas (top 20)</div>
+            <div class="token-grid" id="tokenGrid"></div>
+        </div>
+        <button class="btn-generate" id="generateBtn">🚀 Generar forecast 12 semanas</button>
+        <div style="font-size: 0.7rem; margin-top: 1rem; color: #6b7280;">* Datos OHLC diarios (CoinGecko) + RSI, ATR, medias, regresión logarítmica. Sentimiento por capitalización.</div>
+    </div>
+
+    <div id="resultsContainer"></div>
+    <div class="disclaimer">
+        ⚠️ Este análisis es educativo y no constituye asesoramiento financiero. Los mercados crypto son volátiles. Las predicciones son estimaciones con incertidumbre creciente.
+    </div>
+</div>
+
+<script>
+    // --------------------------------------------------------------
+    // TOP 20 criptos con IDs de CoinGecko
+    // --------------------------------------------------------------
+    const TOP20 = [
+        { symbol: "BTC", name: "Bitcoin", id: "bitcoin" },
+        { symbol: "ETH", name: "Ethereum", id: "ethereum" },
+        { symbol: "BNB", name: "BNB", id: "binancecoin" },
+        { symbol: "XRP", name: "XRP", id: "ripple" },
+        { symbol: "ADA", name: "Cardano", id: "cardano" },
+        { symbol: "SOL", name: "Solana", id: "solana" },
+        { symbol: "DOGE", name: "Dogecoin", id: "dogecoin" },
+        { symbol: "DOT", name: "Polkadot", id: "polkadot" },
+        { symbol: "MATIC", name: "Polygon", id: "polygon" },
+        { symbol: "SHIB", name: "Shiba Inu", id: "shiba-inu" },
+        { symbol: "TRX", name: "TRON", id: "tron" },
+        { symbol: "AVAX", name: "Avalanche", id: "avalanche-2" },
+        { symbol: "UNI", name: "Uniswap", id: "uniswap" },
+        { symbol: "ATOM", name: "Cosmos", id: "cosmos" },
+        { symbol: "LINK", name: "Chainlink", id: "chainlink" },
+        { symbol: "ETC", name: "Ethereum Classic", id: "ethereum-classic" },
+        { symbol: "XLM", name: "Stellar", id: "stellar" },
+        { symbol: "BCH", name: "Bitcoin Cash", id: "bitcoin-cash" },
+        { symbol: "ALGO", name: "Algorand", id: "algorand" },
+        { symbol: "LTC", name: "Litecoin", id: "litecoin" }
+    ];
+
+    // Estado de selección
+    let selectedTokens = new Set(["BTC", "ETH"]);  // por defecto
+
+    // Renderizar chips
+    function renderTokenGrid() {
+        const grid = document.getElementById("tokenGrid");
+        grid.innerHTML = "";
+        TOP20.forEach(token => {
+            const chip = document.createElement("div");
+            chip.className = "token-chip" + (selectedTokens.has(token.symbol) ? " selected" : "");
+            chip.textContent = token.symbol;
+            chip.addEventListener("click", () => {
+                if (selectedTokens.has(token.symbol)) selectedTokens.delete(token.symbol);
+                else selectedTokens.add(token.symbol);
+                renderTokenGrid();
+            });
+            grid.appendChild(chip);
+        });
+    }
+
+    // ---------- funciones de análisis técnico ----------
+    // calcular RSI (periodo 14)
+    function computeRSI(prices, period = 14) {
+        if (prices.length < period + 1) return Array(prices.length).fill(50);
+        let gains = [], losses = [];
+        for (let i = 1; i < prices.length; i++) {
+            let diff = prices[i] - prices[i-1];
+            gains.push(diff > 0 ? diff : 0);
+            losses.push(diff < 0 ? -diff : 0);
+        }
+        let avgGain = gains.slice(0, period).reduce((a,b)=>a+b,0)/period;
+        let avgLoss = losses.slice(0, period).reduce((a,b)=>a+b,0)/period;
+        let rsi = new Array(period).fill(50);
+        for (let i = period; i < prices.length; i++) {
+            avgGain = (avgGain * (period-1) + gains[i-1]) / period;
+            avgLoss = (avgLoss * (period-1) + losses[i-1]) / period;
+            let rs = avgLoss === 0 ? 100 : avgGain / avgLoss;
+            rsi.push(100 - (100 / (1 + rs)));
+        }
+        return rsi;
+    }
+
+    // ATR (Average True Range) - periodo 14
+    function computeATR(high, low, close, period = 14) {
+        let tr = [];
+        for (let i = 1; i < high.length; i++) {
+            let hl = high[i] - low[i];
+            let hc = Math.abs(high[i] - close[i-1]);
+            let lc = Math.abs(low[i] - close[i-1]);
+            tr.push(Math.max(hl, hc, lc));
+        }
+        let atr = new Array(tr.length).fill(0);
+        let sum = tr.slice(0, period).reduce((a,b)=>a+b,0);
+        atr[period-1] = sum / period;
+        for (let i = period; i < tr.length; i++) {
+            atr[i] = (atr[i-1] * (period-1) + tr[i]) / period;
+        }
+        // rellenar primeros valores con atr inicial
+        for (let i = 0; i < period-1; i++) atr[i] = atr[period-1];
+        return atr;
+    }
+
+    // drift semanal estimado mediante regresión lineal sobre log(close) últimos 90 días
+    function estimateWeeklyDrift(prices, daysBack = 90) {
+        if (prices.length < daysBack) daysBack = Math.min(prices.length, 60);
+        const recent = prices.slice(-daysBack);
+        const n = recent.length;
+        let x = Array.from({length: n}, (_,i) => i);
+        let y = recent.map(p => Math.log(p));
+        let sumX = x.reduce((a,b)=>a+b,0);
+        let sumY = y.reduce((a,b)=>a+b,0);
+        let sumXY = 0, sumX2 = 0;
+        for (let i=0; i<n; i++) {
+            sumXY += x[i] * y[i];
+            sumX2 += x[i] * x[i];
+        }
+        let slope = (sumXY - sumX*sumY/n) / (sumX2 - sumX*sumX/n);
+        let dailyDrift = slope;          // pendiente en log-precio por día
+        let weeklyDrift = Math.exp(dailyDrift * 7) - 1;
+        return Math.min(Math.max(weeklyDrift, -0.18), 0.12); // límites realistas
+    }
+
+    // Sentimiento fundamental simple (market cap basado en ranking)
+    function getFundamentalAdjust(symbol) {
+        if (symbol === "BTC") return 0.012;
+        if (symbol === "ETH") return 0.008;
+        if (["BNB","SOL","XRP"].includes(symbol)) return 0.005;
+        return 0.002;   // resto de altcoins pequeño positivo
+    }
+
+    // Generar forecast para un token usando datos OHLC
+    async function generateForecastForToken(token) {
+        const { symbol, id } = token;
+        // fetch OHLC diario últimos 180 días (CoinGecko)
+        const days = 180;
+        const url = `https://api.coingecko.com/api/v3/coins/${id}/ohlc?vs_currency=usd&days=${days}`;
+        const response = await fetch(url);
+        if (!response.ok) throw new Error(`HTTP ${response.status} - ${symbol}`);
+        const ohlc = await response.json();
+        if (!ohlc.length || ohlc.length < 30) throw new Error(`Datos insuficientes para ${symbol}`);
+        
+        // ohlc: cada elemento [timestamp, open, high, low, close]
+        const closes = ohlc.map(bar => bar[4]);
+        const highs = ohlc.map(bar => bar[2]);
+        const lows = ohlc.map(bar => bar[3]);
+        const opens = ohlc.map(bar => bar[1]);
+        
+        const lastClose = closes[closes.length-1];
+        const rsiArray = computeRSI(closes, 14);
+        const atrArray = computeATR(highs, lows, closes, 14);
+        const currentRsi = rsiArray[rsiArray.length-1];
+        const currentAtr = atrArray[atrArray.length-1];
+        
+        // Drift semanal y ajuste fundamental
+        let drift = estimateWeeklyDrift(closes, 90);
+        const fundAdj = getFundamentalAdjust(symbol);
+        const effectiveDrift = drift + fundAdj;
+        
+        // volatilidad multiplicador según activo
+        let volMult = 1.0;
+        if (symbol === "BTC") volMult = 0.9;
+        else if (symbol === "ETH") volMult = 1.1;
+        else volMult = 1.4;
+        
+        const weeks = 12;
+        const forecasts = [];
+        const today = new Date();
+        for (let w = 1; w <= weeks; w++) {
+            // precio central con crecimiento compuesto semanal
+            const centralPrice = lastClose * Math.pow(1 + effectiveDrift, w);
+            // rango: ATR * sqrt(semanas) * volMult
+            const halfRange = currentAtr * Math.sqrt(w) * volMult;
+            let lower = centralPrice - halfRange;
+            let upper = centralPrice + halfRange;
+            if (lower < centralPrice * 0.25) lower = centralPrice * 0.25; // suelo lógico
+            // fecha del lunes correspondiente
+            const mondayDate = new Date(today);
+            mondayDate.setDate(today.getDate() + (w * 7) + (1 - today.getDay())); // ajuste a lunes
+            const dateStr = mondayDate.toISOString().slice(0,10);
+            forecasts.push({
+                week: w,
+                date: dateStr,
+                lower: lower,
+                central: centralPrice,
+                upper: upper
+            });
+        }
+        return {
+            symbol,
+            name: token.name,
+            lastClose,
+            currentRsi: currentRsi.toFixed(1),
+            currentAtr: currentAtr.toFixed(2),
+            driftPercent: (effectiveDrift*100).toFixed(2),
+            forecasts
+        };
+    }
+
+    // Renderizar tabla de resultados
+    function renderResult(result) {
+        return `
+            <div class="result-card">
+                <div class="result-header">
+                    <div class="coin-symbol">${result.symbol} · ${result.name}</div>
+                    <div class="indicators">
+                        <span>📉 Precio actual: $${result.lastClose.toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2})}</span>
+                        <span>📊 RSI(14): ${result.currentRsi}</span>
+                        <span>⚡ ATR: $${result.currentAtr}</span>
+                        <span>📈 Drift semanal: ${result.driftPercent}%</span>
+                    </div>
+                </div>
+                <div style="overflow-x: auto;">
+                    <table>
+                        <thead>
+                            <tr><th>Semana</th><th>Lunes (fecha)</th><th>Rango bajo ($)</th><th>Precio esperado ($)</th><th>Rango alto ($)</th></tr>
+                        </thead>
+                        <tbody>
+                            ${result.forecasts.map(f => `
+                                <tr>
+                                    <td>${f.week}</td>
+                                    <td>${f.date}</td>
+                                    <td class="price-low">$${f.lower.toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2})}</td>
+                                    <td class="price-central">$${f.central.toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2})}</td>
+                                    <td class="price-high">$${f.upper.toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2})}</td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        `;
+    }
+
+    // Generar forecasts para tokens seleccionados
+    document.getElementById("generateBtn").addEventListener("click", async () => {
+        const resultsDiv = document.getElementById("resultsContainer");
+        const selectedSymbols = Array.from(selectedTokens);
+        if (selectedSymbols.length === 0) {
+            resultsDiv.innerHTML = `<div style="background:#1e1f2a; border-radius:24px; padding:2rem; text-align:center;">❌ Selecciona al menos una criptomoneda.</div>`;
+            return;
+        }
+        
+        resultsDiv.innerHTML = `<div class="loading"><div class="spinner"></div> Cargando datos y generando forecast (puede tomar unos segundos)...</div>`;
+        
+        const tokensToFetch = TOP20.filter(t => selectedSymbols.includes(t.symbol));
+        const results = [];
+        for (const token of tokensToFetch) {
+            try {
+                const forecast = await generateForecastForToken(token);
+                results.push(forecast);
+            } catch (err) {
+                console.error(`Error con ${token.symbol}:`, err);
+                resultsDiv.innerHTML += `<div class="result-card" style="background:#1e1a24;"><div class="result-header">⚠️ Error con ${token.symbol}: ${err.message}</div></div>`;
+            }
+        }
+        
+        if (results.length === 0) {
+            resultsDiv.innerHTML = `<div class="loading">No se pudo generar ningún forecast. Revisa consola o límites de API.</div>`;
+            return;
+        }
+        
+        resultsDiv.innerHTML = results.map(r => renderResult(r)).join('');
+    });
+    
+    // inicializar UI
+    renderTokenGrid();
+</script>
+</body>
+</html>
