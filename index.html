@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>Trade Hub - Crypto Forecast 12 Semanas</title>
+    <title>Trade Hub Pro - Crypto Forecast + Advanced TA</title>
     <style>
         * {
             margin: 0;
@@ -13,7 +13,7 @@
 
         body {
             background: #0a0c12;
-            font-family: 'Segoe UI', 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Roboto', monospace;
+            font-family: 'Segoe UI', 'Inter', system-ui, monospace;
             color: #e0e3eb;
             padding: 2rem 1.5rem;
         }
@@ -23,7 +23,6 @@
             margin: 0 auto;
         }
 
-        /* encabezado estilo trading hub */
         .header {
             display: flex;
             justify-content: space-between;
@@ -41,13 +40,6 @@
             -webkit-background-clip: text;
             background-clip: text;
             color: transparent;
-            letter-spacing: -0.5px;
-        }
-
-        .title p {
-            font-size: 0.85rem;
-            color: #8e95a8;
-            margin-top: 0.25rem;
         }
 
         .badge {
@@ -55,23 +47,15 @@
             padding: 0.4rem 1rem;
             border-radius: 40px;
             font-size: 0.8rem;
-            font-weight: 500;
             border: 1px solid #2f3545;
-            color: #b9ffd6;
         }
 
-        /* panel de control */
         .control-panel {
             background: #0f121b;
             border-radius: 24px;
             padding: 1.5rem;
             margin-bottom: 2rem;
             border: 1px solid #252a38;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.4);
-        }
-
-        .token-selector {
-            margin-bottom: 1.5rem;
         }
 
         .token-grid {
@@ -79,62 +63,56 @@
             flex-wrap: wrap;
             gap: 0.6rem;
             margin-top: 0.8rem;
+            margin-bottom: 1.5rem;
         }
 
         .token-chip {
             background: #161a24;
             border-radius: 40px;
             padding: 0.5rem 1.2rem;
-            font-size: 0.9rem;
-            font-weight: 500;
             cursor: pointer;
-            transition: all 0.2s ease;
             border: 1px solid #2d3243;
-            color: #bfc7df;
+            transition: 0.2s;
         }
 
         .token-chip.selected {
             background: #2cff9e20;
             border-color: #2cff9e;
             color: #b6ffd0;
-            box-shadow: 0 0 6px rgba(44,255,158,0.3);
         }
 
-        .token-chip:hover {
-            background: #202433;
-            transform: translateY(-1px);
-        }
-
-        .btn-generate {
+        .btn-generate, .btn-advanced {
             background: linear-gradient(90deg, #00c896, #00a97a);
             border: none;
             color: #0a0c12;
             font-weight: bold;
-            padding: 0.8rem 2rem;
+            padding: 0.8rem 1.8rem;
             border-radius: 48px;
-            font-size: 1rem;
+            font-size: 0.9rem;
             cursor: pointer;
-            transition: 0.2s;
-            box-shadow: 0 2px 8px rgba(0,200,150,0.3);
-            width: 100%;
-            max-width: 260px;
+            margin-right: 1rem;
+            margin-bottom: 0.5rem;
             font-family: inherit;
         }
 
-        .btn-generate:hover {
-            background: linear-gradient(90deg, #00e6aa, #00c48a);
-            transform: scale(1.01);
-            box-shadow: 0 4px 14px rgba(0,200,150,0.4);
+        .btn-advanced {
+            background: #2a2e3c;
+            color: #ddd;
+            box-shadow: none;
         }
 
-        /* cards de resultados */
+        .btn-advanced.active {
+            background: #ffb347;
+            color: #0a0c12;
+            box-shadow: 0 0 8px #ffb347;
+        }
+
         .result-card {
             background: #0f121b;
             border-radius: 28px;
             margin-bottom: 2rem;
             border: 1px solid #262d3e;
             overflow-x: auto;
-            transition: all 0.2s;
         }
 
         .result-header {
@@ -144,6 +122,7 @@
             padding: 1rem 1.5rem;
             background: #0b0e16;
             border-bottom: 1px solid #232838;
+            flex-wrap: wrap;
         }
 
         .coin-symbol {
@@ -157,15 +136,15 @@
 
         .indicators {
             display: flex;
-            gap: 1.2rem;
-            font-size: 0.8rem;
+            gap: 1rem;
+            font-size: 0.75rem;
+            flex-wrap: wrap;
         }
 
         .indicators span {
             background: #1a1e2a;
             padding: 0.25rem 0.7rem;
             border-radius: 20px;
-            font-family: monospace;
         }
 
         table {
@@ -175,41 +154,20 @@
         }
 
         th, td {
-            padding: 0.9rem 0.8rem;
-            text-align: center;
+            padding: 0.8rem 0.6rem;
             border-bottom: 1px solid #1e2332;
+            text-align: center;
         }
 
-        th {
-            background: #0c0f18;
-            color: #b7c0dd;
-            font-weight: 600;
-            position: sticky;
-            top: 0;
-        }
-
-        td {
-            color: #d2d9f0;
-        }
-
-        .price-low {
-            color: #ff9f7c;
-        }
-        .price-central {
-            color: #d0ffb0;
-            font-weight: 500;
-        }
-        .price-high {
-            color: #7cf9b0;
-        }
+        .price-low { color: #ff9f7c; }
+        .price-central { color: #d0ffb0; font-weight: 500; }
+        .price-high { color: #7cf9b0; }
 
         .loading {
             display: flex;
             justify-content: center;
-            align-items: center;
             gap: 12px;
             padding: 2rem;
-            color: #8e9aaf;
         }
 
         .spinner {
@@ -221,23 +179,13 @@
             animation: spin 0.8s linear infinite;
         }
 
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
+        @keyframes spin { to { transform: rotate(360deg); } }
 
         .disclaimer {
             text-align: center;
             font-size: 0.7rem;
-            margin-top: 2.5rem;
+            margin-top: 2rem;
             color: #5f6a84;
-            border-top: 1px solid #202433;
-            padding-top: 1.5rem;
-        }
-
-        @media (max-width: 700px) {
-            body { padding: 1rem; }
-            th, td { padding: 0.5rem 0.3rem; font-size: 0.7rem; }
-            .result-header { flex-direction: column; align-items: flex-start; gap: 0.6rem; }
         }
     </style>
 </head>
@@ -245,31 +193,30 @@
 <div class="container">
     <div class="header">
         <div class="title">
-            <h1>📊 Trade Hub · Crypto Forecast</h1>
-            <p>Análisis técnico + fundamental | Rango de precios esperados (Lunes - 12 semanas)</p>
+            <h1>📈 Trade Hub Pro · Advanced TA</h1>
+            <p>Soportes, resistencias, patrones de velas, divergencias RSI, volumen y eventos</p>
         </div>
-        <div class="badge">🔮 modelo híbrido | ATR + drift lineal</div>
+        <div class="badge">🔮 modelo adaptativo</div>
     </div>
 
     <div class="control-panel">
         <div class="token-selector">
-            <div style="margin-bottom: 10px; font-weight: 500;">📌 Selecciona criptomonedas (top 20)</div>
+            <div style="margin-bottom: 10px;">📌 Top 20 criptos</div>
             <div class="token-grid" id="tokenGrid"></div>
         </div>
-        <button class="btn-generate" id="generateBtn">🚀 Generar forecast 12 semanas</button>
-        <div style="font-size: 0.7rem; margin-top: 1rem; color: #6b7280;">* Datos OHLC diarios (CoinGecko) + RSI, ATR, medias, regresión logarítmica. Sentimiento por capitalización.</div>
+        <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 12px;">
+            <button class="btn-generate" id="generateBtn">🚀 Generar forecast 12 semanas</button>
+            <button class="btn-advanced" id="advancedBtn">⚙️ Activar análisis técnico avanzado</button>
+        </div>
+        <div style="font-size: 0.7rem; margin-top: 1rem;" id="advancedStatus">Modo básico activo. Haz clic en el botón para incluir soportes/resistencias, patrones, divergencias, volumen y eventos.</div>
     </div>
 
     <div id="resultsContainer"></div>
-    <div class="disclaimer">
-        ⚠️ Este análisis es educativo y no constituye asesoramiento financiero. Los mercados crypto son volátiles. Las predicciones son estimaciones con incertidumbre creciente.
-    </div>
+    <div class="disclaimer">⚠️ Modelo educativo. Las predicciones no son consejo financiero.</div>
 </div>
 
 <script>
-    // --------------------------------------------------------------
-    // TOP 20 criptos con IDs de CoinGecko
-    // --------------------------------------------------------------
+    // ======================= TOP 20 =======================
     const TOP20 = [
         { symbol: "BTC", name: "Bitcoin", id: "bitcoin" },
         { symbol: "ETH", name: "Ethereum", id: "ethereum" },
@@ -293,10 +240,10 @@
         { symbol: "LTC", name: "Litecoin", id: "litecoin" }
     ];
 
-    // Estado de selección
-    let selectedTokens = new Set(["BTC", "ETH"]);  // por defecto
+    let selectedTokens = new Set(["BTC", "ETH"]);
+    let advancedMode = false;
 
-    // Renderizar chips
+    // Render chips
     function renderTokenGrid() {
         const grid = document.getElementById("tokenGrid");
         grid.innerHTML = "";
@@ -313,211 +260,335 @@
         });
     }
 
-    // ---------- funciones de análisis técnico ----------
-    // calcular RSI (periodo 14)
-    function computeRSI(prices, period = 14) {
-        if (prices.length < period + 1) return Array(prices.length).fill(50);
-        let gains = [], losses = [];
-        for (let i = 1; i < prices.length; i++) {
-            let diff = prices[i] - prices[i-1];
-            gains.push(diff > 0 ? diff : 0);
-            losses.push(diff < 0 ? -diff : 0);
+    // ========== HERRAMIENTAS DE ANÁLISIS TÉCNICO AVANZADO ==========
+    function findSupportResistance(prices, lookback = 20, threshold = 0.02) {
+        // Detecta picos y valles como soportes/resistencias
+        let levels = [];
+        for (let i = lookback; i < prices.length - lookback; i++) {
+            let isPeak = true, isTrough = true;
+            for (let j = i - lookback; j <= i + lookback; j++) {
+                if (j === i) continue;
+                if (prices[j] >= prices[i]) isPeak = false;
+                if (prices[j] <= prices[i]) isTrough = false;
+            }
+            if (isPeak) levels.push({ price: prices[i], type: "resistance" });
+            if (isTrough) levels.push({ price: prices[i], type: "support" });
         }
-        let avgGain = gains.slice(0, period).reduce((a,b)=>a+b,0)/period;
-        let avgLoss = losses.slice(0, period).reduce((a,b)=>a+b,0)/period;
-        let rsi = new Array(period).fill(50);
-        for (let i = period; i < prices.length; i++) {
-            avgGain = (avgGain * (period-1) + gains[i-1]) / period;
-            avgLoss = (avgLoss * (period-1) + losses[i-1]) / period;
-            let rs = avgLoss === 0 ? 100 : avgGain / avgLoss;
-            rsi.push(100 - (100 / (1 + rs)));
+        // Agrupar niveles cercanos
+        const unique = [];
+        for (let l of levels) {
+            let close = unique.find(u => Math.abs(u.price - l.price) / l.price < threshold);
+            if (!close) unique.push(l);
+        }
+        return unique;
+    }
+
+    function detectCandlestickPatterns(opens, highs, lows, closes) {
+        if (opens.length < 2) return 0;
+        const last = closes.length - 1;
+        const body = Math.abs(closes[last] - opens[last]);
+        const upperWick = highs[last] - Math.max(opens[last], closes[last]);
+        const lowerWick = Math.min(opens[last], closes[last]) - lows[last];
+        const totalRange = highs[last] - lows[last];
+        
+        let score = 0;
+        // Doji: cuerpo muy pequeño
+        if (totalRange > 0 && body / totalRange < 0.1) score += 0.2;
+        // Martillo: cuerpo pequeño, mecha inferior larga (>=2x cuerpo)
+        if (lowerWick > body * 2 && upperWick < body) score += 0.4;
+        // Envolvente alcista: vela actual cierra > apertura y cubre a la anterior
+        if (last >= 1 && closes[last] > opens[last] && opens[last] < closes[last-1] && closes[last] > opens[last-1])
+            score += 0.5;
+        // Envolvente bajista
+        if (last >= 1 && closes[last] < opens[last] && opens[last] > closes[last-1] && closes[last] < opens[last-1])
+            score -= 0.5;
+        return Math.min(Math.max(score, -0.8), 0.8);
+    }
+
+    function detectRSIDivergence(prices, rsiArray) {
+        if (prices.length < 20 || rsiArray.length < 20) return 0;
+        const lastPrice = prices[prices.length-1];
+        const prevPrice = prices[prices.length-6];
+        const lastRsi = rsiArray[rsiArray.length-1];
+        const prevRsi = rsiArray[rsiArray.length-6];
+        // Divergencia alcista: precio baja pero RSI sube
+        if (lastPrice < prevPrice && lastRsi > prevRsi) return 0.6;
+        // Divergencia bajista: precio sube pero RSI baja
+        if (lastPrice > prevPrice && lastRsi < prevRsi) return -0.6;
+        return 0;
+    }
+
+    function volumeAnalysis(volumes, prices) {
+        if (volumes.length < 20) return 0;
+        const avgVol = volumes.slice(-20).reduce((a,b)=>a+b,0)/20;
+        const lastVol = volumes[volumes.length-1];
+        const volSurge = lastVol / avgVol;
+        let factor = 0;
+        if (volSurge > 1.8) factor = 0.3;   // volumen extremo => posible aceleración
+        else if (volSurge > 1.3) factor = 0.1;
+        // Tendencia de volumen creciente
+        const volTrend = volumes.slice(-10).reduce((a,b,i,arr)=> a + (b - (arr[i-1]||b)),0);
+        if (volTrend > 0) factor += 0.1;
+        return Math.min(factor, 0.5);
+    }
+
+    function eventAdjustment(prices, volumes, atr) {
+        // Simula evento basado en pico de volatilidad reciente (desvío estándar de retornos)
+        const returns = [];
+        for (let i=1; i<prices.length; i++) returns.push((prices[i]-prices[i-1])/prices[i-1]);
+        const last10Ret = returns.slice(-10);
+        const avgRet = last10Ret.reduce((a,b)=>a+b,0)/10;
+        const stdRet = Math.sqrt(last10Ret.map(r=>Math.pow(r-avgRet,2)).reduce((a,b)=>a+b,0)/10);
+        const recentVolatility = stdRet;
+        const normalVol = 0.03; // 3% diario aproximado
+        let eventFactor = 0;
+        if (recentVolatility > normalVol * 1.8) eventFactor = 0.25; // evento alcista volátil
+        else if (recentVolatility > normalVol * 1.3) eventFactor = 0.1;
+        // Volumen anómalo también puede ser evento
+        const avgVol = volumes.slice(-20).reduce((a,b)=>a+b,0)/20;
+        const lastVol = volumes[volumes.length-1];
+        if (lastVol > avgVol * 2) eventFactor += 0.2;
+        return Math.min(eventFactor, 0.5);
+    }
+
+    // ========== FUNCIONES BASE (RSI, ATR, drift) ==========
+    function computeRSI(prices, period=14) {
+        if (prices.length < period+1) return Array(prices.length).fill(50);
+        let gains=[], losses=[];
+        for(let i=1;i<prices.length;i++){
+            let diff=prices[i]-prices[i-1];
+            gains.push(diff>0?diff:0);
+            losses.push(diff<0?-diff:0);
+        }
+        let avgGain=gains.slice(0,period).reduce((a,b)=>a+b,0)/period;
+        let avgLoss=losses.slice(0,period).reduce((a,b)=>a+b,0)/period;
+        let rsi=new Array(period).fill(50);
+        for(let i=period;i<prices.length;i++){
+            avgGain=(avgGain*(period-1)+gains[i-1])/period;
+            avgLoss=(avgLoss*(period-1)+losses[i-1])/period;
+            let rs=avgLoss===0?100:avgGain/avgLoss;
+            rsi.push(100-(100/(1+rs)));
         }
         return rsi;
     }
 
-    // ATR (Average True Range) - periodo 14
-    function computeATR(high, low, close, period = 14) {
-        let tr = [];
-        for (let i = 1; i < high.length; i++) {
-            let hl = high[i] - low[i];
-            let hc = Math.abs(high[i] - close[i-1]);
-            let lc = Math.abs(low[i] - close[i-1]);
-            tr.push(Math.max(hl, hc, lc));
+    function computeATR(high, low, close, period=14){
+        let tr=[];
+        for(let i=1;i<high.length;i++){
+            let hl=high[i]-low[i];
+            let hc=Math.abs(high[i]-close[i-1]);
+            let lc=Math.abs(low[i]-close[i-1]);
+            tr.push(Math.max(hl,hc,lc));
         }
-        let atr = new Array(tr.length).fill(0);
-        let sum = tr.slice(0, period).reduce((a,b)=>a+b,0);
-        atr[period-1] = sum / period;
-        for (let i = period; i < tr.length; i++) {
-            atr[i] = (atr[i-1] * (period-1) + tr[i]) / period;
+        let atr=new Array(tr.length).fill(0);
+        let sum=tr.slice(0,period).reduce((a,b)=>a+b,0);
+        atr[period-1]=sum/period;
+        for(let i=period;i<tr.length;i++){
+            atr[i]=(atr[i-1]*(period-1)+tr[i])/period;
         }
-        // rellenar primeros valores con atr inicial
-        for (let i = 0; i < period-1; i++) atr[i] = atr[period-1];
+        for(let i=0;i<period-1;i++) atr[i]=atr[period-1];
         return atr;
     }
 
-    // drift semanal estimado mediante regresión lineal sobre log(close) últimos 90 días
-    function estimateWeeklyDrift(prices, daysBack = 90) {
-        if (prices.length < daysBack) daysBack = Math.min(prices.length, 60);
-        const recent = prices.slice(-daysBack);
-        const n = recent.length;
-        let x = Array.from({length: n}, (_,i) => i);
-        let y = recent.map(p => Math.log(p));
-        let sumX = x.reduce((a,b)=>a+b,0);
-        let sumY = y.reduce((a,b)=>a+b,0);
-        let sumXY = 0, sumX2 = 0;
-        for (let i=0; i<n; i++) {
-            sumXY += x[i] * y[i];
-            sumX2 += x[i] * x[i];
+    function estimateWeeklyDrift(prices, daysBack=90){
+        if(prices.length<daysBack) daysBack=Math.min(prices.length,60);
+        const recent=prices.slice(-daysBack);
+        const n=recent.length;
+        let x=Array.from({length:n},(_,i)=>i);
+        let y=recent.map(p=>Math.log(p));
+        let sumX=x.reduce((a,b)=>a+b,0);
+        let sumY=y.reduce((a,b)=>a+b,0);
+        let sumXY=0,sumX2=0;
+        for(let i=0;i<n;i++){
+            sumXY+=x[i]*y[i];
+            sumX2+=x[i]*x[i];
         }
-        let slope = (sumXY - sumX*sumY/n) / (sumX2 - sumX*sumX/n);
-        let dailyDrift = slope;          // pendiente en log-precio por día
-        let weeklyDrift = Math.exp(dailyDrift * 7) - 1;
-        return Math.min(Math.max(weeklyDrift, -0.18), 0.12); // límites realistas
+        let slope=(sumXY-sumX*sumY/n)/(sumX2-sumX*sumX/n);
+        let weeklyDrift=Math.exp(slope*7)-1;
+        return Math.min(Math.max(weeklyDrift,-0.18),0.12);
     }
 
-    // Sentimiento fundamental simple (market cap basado en ranking)
-    function getFundamentalAdjust(symbol) {
-        if (symbol === "BTC") return 0.012;
-        if (symbol === "ETH") return 0.008;
-        if (["BNB","SOL","XRP"].includes(symbol)) return 0.005;
-        return 0.002;   // resto de altcoins pequeño positivo
+    // ========== FETCH COMPLETO CON VOLUMEN ==========
+    async function fetchFullData(tokenId) {
+        // OHLC para precios y velas
+        const ohlcUrl = `https://api.coingecko.com/api/v3/coins/${tokenId}/ohlc?vs_currency=usd&days=180`;
+        const marketUrl = `https://api.coingecko.com/api/v3/coins/${tokenId}/market_chart?vs_currency=usd&days=180`;
+        const [ohlcRes, marketRes] = await Promise.all([fetch(ohlcUrl), fetch(marketUrl)]);
+        if (!ohlcRes.ok || !marketRes.ok) throw new Error("Error fetching data");
+        const ohlc = await ohlcRes.json();
+        const market = await marketRes.json();
+        if (!ohlc.length) throw new Error("No OHLC data");
+        // market.total_volumes: [[timestamp, volume]]
+        const volumes = market.total_volumes.map(v => v[1]);
+        // Asegurar misma longitud que ohlc (trim)
+        const minLen = Math.min(ohlc.length, volumes.length);
+        const closes = ohlc.slice(0,minLen).map(bar=>bar[4]);
+        const highs = ohlc.slice(0,minLen).map(bar=>bar[2]);
+        const lows = ohlc.slice(0,minLen).map(bar=>bar[3]);
+        const opens = ohlc.slice(0,minLen).map(bar=>bar[1]);
+        const vols = volumes.slice(0,minLen);
+        return { closes, highs, lows, opens, volumes: vols };
     }
 
-    // Generar forecast para un token usando datos OHLC
+    // ========== GENERAR FORECAST CON O SIN MODO AVANZADO ==========
     async function generateForecastForToken(token) {
-        const { symbol, id } = token;
-        // fetch OHLC diario últimos 180 días (CoinGecko)
-        const days = 180;
-        const url = `https://api.coingecko.com/api/v3/coins/${id}/ohlc?vs_currency=usd&days=${days}`;
-        const response = await fetch(url);
-        if (!response.ok) throw new Error(`HTTP ${response.status} - ${symbol}`);
-        const ohlc = await response.json();
-        if (!ohlc.length || ohlc.length < 30) throw new Error(`Datos insuficientes para ${symbol}`);
-        
-        // ohlc: cada elemento [timestamp, open, high, low, close]
-        const closes = ohlc.map(bar => bar[4]);
-        const highs = ohlc.map(bar => bar[2]);
-        const lows = ohlc.map(bar => bar[3]);
-        const opens = ohlc.map(bar => bar[1]);
+        const { symbol, id, name } = token;
+        const { closes, highs, lows, opens, volumes } = await fetchFullData(id);
+        if (closes.length < 60) throw new Error("Pocos datos");
         
         const lastClose = closes[closes.length-1];
-        const rsiArray = computeRSI(closes, 14);
-        const atrArray = computeATR(highs, lows, closes, 14);
-        const currentRsi = rsiArray[rsiArray.length-1];
-        const currentAtr = atrArray[atrArray.length-1];
-        
-        // Drift semanal y ajuste fundamental
+        const rsiArr = computeRSI(closes, 14);
+        const atrArr = computeATR(highs, lows, closes, 14);
+        const currentRsi = rsiArr[rsiArr.length-1];
+        const currentAtr = atrArr[atrArr.length-1];
         let drift = estimateWeeklyDrift(closes, 90);
-        const fundAdj = getFundamentalAdjust(symbol);
-        const effectiveDrift = drift + fundAdj;
         
-        // volatilidad multiplicador según activo
-        let volMult = 1.0;
-        if (symbol === "BTC") volMult = 0.9;
-        else if (symbol === "ETH") volMult = 1.1;
-        else volMult = 1.4;
+        // Ajuste fundamental base
+        let fundAdj = symbol==="BTC"?0.012 : symbol==="ETH"?0.008 : ["BNB","SOL","XRP"].includes(symbol)?0.005:0.002;
+        
+        let extraDrift = 0;
+        let rangeMultiplier = 1.0;
+        
+        if (advancedMode) {
+            // Soporte/resistencia: si precio cerca de soporte, sesgo alcista; cerca de resistencia, sesgo bajista
+            const levels = findSupportResistance(closes, 15, 0.02);
+            let nearestSupport = null, nearestResist = null;
+            for (let l of levels) {
+                if (l.type === "support" && l.price < lastClose && (!nearestSupport || l.price > nearestSupport)) nearestSupport = l.price;
+                if (l.type === "resistance" && l.price > lastClose && (!nearestResist || l.price < nearestResist)) nearestResist = l.price;
+            }
+            if (nearestSupport && (lastClose - nearestSupport)/lastClose < 0.03) extraDrift += 0.008;
+            if (nearestResist && (nearestResist - lastClose)/lastClose < 0.03) extraDrift -= 0.006;
+            
+            // Patrones de velas
+            const patternScore = detectCandlestickPatterns(opens, highs, lows, closes);
+            extraDrift += patternScore * 0.015;
+            
+            // Divergencias RSI
+            const divScore = detectRSIDivergence(closes, rsiArr);
+            extraDrift += divScore * 0.02;
+            
+            // Volumen
+            const volFactor = volumeAnalysis(volumes, closes);
+            extraDrift += volFactor * 0.01;
+            
+            // Eventos (simulado)
+            const eventFactor = eventAdjustment(closes, volumes, currentAtr);
+            extraDrift += eventFactor * 0.02;
+            
+            // Ajuste de rango: si hay alta volatilidad o volumen, ampliamos rango
+            const avgVol = volumes.slice(-20).reduce((a,b)=>a+b,0)/20;
+            const lastVol = volumes[volumes.length-1];
+            if (lastVol > avgVol * 1.5) rangeMultiplier = 1.2;
+            if (Math.abs(extraDrift) > 0.02) rangeMultiplier *= 1.1;
+        }
+        
+        const effectiveDrift = drift + fundAdj + extraDrift;
+        // Multiplicador de volatilidad según activo
+        let volMult = symbol==="BTC"?0.9 : symbol==="ETH"?1.1 : 1.4;
+        volMult *= rangeMultiplier;
         
         const weeks = 12;
         const forecasts = [];
         const today = new Date();
         for (let w = 1; w <= weeks; w++) {
-            // precio central con crecimiento compuesto semanal
             const centralPrice = lastClose * Math.pow(1 + effectiveDrift, w);
-            // rango: ATR * sqrt(semanas) * volMult
-            const halfRange = currentAtr * Math.sqrt(w) * volMult;
-            let lower = centralPrice - halfRange;
+            let halfRange = currentAtr * Math.sqrt(w) * volMult;
+            let lower = Math.max(centralPrice - halfRange, centralPrice * 0.25);
             let upper = centralPrice + halfRange;
-            if (lower < centralPrice * 0.25) lower = centralPrice * 0.25; // suelo lógico
-            // fecha del lunes correspondiente
-            const mondayDate = new Date(today);
-            mondayDate.setDate(today.getDate() + (w * 7) + (1 - today.getDay())); // ajuste a lunes
-            const dateStr = mondayDate.toISOString().slice(0,10);
+            const monday = new Date(today);
+            monday.setDate(today.getDate() + (w*7) + (1 - today.getDay()));
             forecasts.push({
                 week: w,
-                date: dateStr,
-                lower: lower,
-                central: centralPrice,
-                upper: upper
+                date: monday.toISOString().slice(0,10),
+                lower, central: centralPrice, upper
             });
         }
         return {
-            symbol,
-            name: token.name,
-            lastClose,
+            symbol, name, lastClose,
             currentRsi: currentRsi.toFixed(1),
             currentAtr: currentAtr.toFixed(2),
             driftPercent: (effectiveDrift*100).toFixed(2),
-            forecasts
+            forecasts,
+            advancedUsed: advancedMode
         };
     }
 
-    // Renderizar tabla de resultados
-    function renderResult(result) {
+    function renderResult(r) {
+        const advBadge = r.advancedUsed ? '<span style="background:#ffb34720; padding:2px 8px; border-radius:16px;">🔬 Análisis avanzado activo</span>' : '';
         return `
-            <div class="result-card">
-                <div class="result-header">
-                    <div class="coin-symbol">${result.symbol} · ${result.name}</div>
-                    <div class="indicators">
-                        <span>📉 Precio actual: $${result.lastClose.toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2})}</span>
-                        <span>📊 RSI(14): ${result.currentRsi}</span>
-                        <span>⚡ ATR: $${result.currentAtr}</span>
-                        <span>📈 Drift semanal: ${result.driftPercent}%</span>
-                    </div>
-                </div>
-                <div style="overflow-x: auto;">
-                    <table>
-                        <thead>
-                            <tr><th>Semana</th><th>Lunes (fecha)</th><th>Rango bajo ($)</th><th>Precio esperado ($)</th><th>Rango alto ($)</th></tr>
-                        </thead>
-                        <tbody>
-                            ${result.forecasts.map(f => `
-                                <tr>
-                                    <td>${f.week}</td>
-                                    <td>${f.date}</td>
-                                    <td class="price-low">$${f.lower.toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2})}</td>
-                                    <td class="price-central">$${f.central.toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2})}</td>
-                                    <td class="price-high">$${f.upper.toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2})}</td>
-                                </tr>
-                            `).join('')}
-                        </tbody>
-                    </table>
+        <div class="result-card">
+            <div class="result-header">
+                <div class="coin-symbol">${r.symbol} · ${r.name}</div>
+                <div class="indicators">
+                    <span>💰 $${r.lastClose.toLocaleString(undefined,{minimumFractionDigits:2})}</span>
+                    <span>📊 RSI: ${r.currentRsi}</span>
+                    <span>⚡ ATR: $${r.currentAtr}</span>
+                    <span>📈 Drift: ${r.driftPercent}%</span>
+                    ${advBadge}
                 </div>
             </div>
-        `;
+            <div style="overflow-x:auto;">
+                <table>
+                    <thead><tr><th>Semana</th><th>Lunes</th><th>Rango bajo ($)</th><th>Esperado ($)</th><th>Rango alto ($)</th></tr></thead>
+                    <tbody>
+                        ${r.forecasts.map(f => `
+                        <tr>
+                            <td>${f.week}</td>
+                            <td>${f.date}</td>
+                            <td class="price-low">$${f.lower.toLocaleString(undefined,{minimumFractionDigits:2})}</td>
+                            <td class="price-central">$${f.central.toLocaleString(undefined,{minimumFractionDigits:2})}</td>
+                            <td class="price-high">$${f.upper.toLocaleString(undefined,{minimumFractionDigits:2})}</td>
+                        </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            </div>
+        </div>`;
     }
 
-    // Generar forecasts para tokens seleccionados
+    // Eventos UI
+    document.getElementById("advancedBtn").addEventListener("click", () => {
+        advancedMode = !advancedMode;
+        const btn = document.getElementById("advancedBtn");
+        const statusDiv = document.getElementById("advancedStatus");
+        if (advancedMode) {
+            btn.classList.add("active");
+            btn.textContent = "✅ Análisis avanzado ACTIVADO";
+            statusDiv.innerHTML = "🧠 Modo avanzado: soportes/resistencias, patrones de velas, divergencias RSI, volumen y eventos simulados activos.";
+        } else {
+            btn.classList.remove("active");
+            btn.textContent = "⚙️ Activar análisis técnico avanzado";
+            statusDiv.innerHTML = "Modo básico activo. Haz clic para incluir todas las herramientas de trader experto.";
+        }
+    });
+
     document.getElementById("generateBtn").addEventListener("click", async () => {
         const resultsDiv = document.getElementById("resultsContainer");
-        const selectedSymbols = Array.from(selectedTokens);
-        if (selectedSymbols.length === 0) {
-            resultsDiv.innerHTML = `<div style="background:#1e1f2a; border-radius:24px; padding:2rem; text-align:center;">❌ Selecciona al menos una criptomoneda.</div>`;
+        const selected = Array.from(selectedTokens);
+        if (selected.length === 0) {
+            resultsDiv.innerHTML = `<div style="padding:2rem;text-align:center;">❌ Selecciona al menos una moneda</div>`;
             return;
         }
-        
-        resultsDiv.innerHTML = `<div class="loading"><div class="spinner"></div> Cargando datos y generando forecast (puede tomar unos segundos)...</div>`;
-        
-        const tokensToFetch = TOP20.filter(t => selectedSymbols.includes(t.symbol));
+        resultsDiv.innerHTML = `<div class="loading"><div class="spinner"></div> Generando forecast (puede tomar 15-30s)...</div>`;
+        const tokensToFetch = TOP20.filter(t => selected.includes(t.symbol));
         const results = [];
-        for (const token of tokensToFetch) {
+        for (let token of tokensToFetch) {
             try {
                 const forecast = await generateForecastForToken(token);
                 results.push(forecast);
-            } catch (err) {
-                console.error(`Error con ${token.symbol}:`, err);
-                resultsDiv.innerHTML += `<div class="result-card" style="background:#1e1a24;"><div class="result-header">⚠️ Error con ${token.symbol}: ${err.message}</div></div>`;
+            } catch(e) {
+                console.error(token.symbol, e);
+                resultsDiv.innerHTML += `<div class="result-card" style="background:#1e1a24;"><div class="result-header">❌ Error con ${token.symbol}: ${e.message}</div></div>`;
             }
         }
-        
         if (results.length === 0) {
-            resultsDiv.innerHTML = `<div class="loading">No se pudo generar ningún forecast. Revisa consola o límites de API.</div>`;
+            resultsDiv.innerHTML = `<div class="loading">No se pudo generar forecast. Revisa consola.</div>`;
             return;
         }
-        
         resultsDiv.innerHTML = results.map(r => renderResult(r)).join('');
     });
-    
-    // inicializar UI
+
     renderTokenGrid();
 </script>
 </body>
